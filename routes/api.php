@@ -14,10 +14,10 @@ use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\TaskController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->middleware('throttle:api')->group(function () {
 
-    // Authentication Routes
-    Route::prefix('auth')->group(function () {
+    // Authentication Routes (Protected by Auth Rate Limiter)
+    Route::prefix('auth')->middleware('throttle:auth')->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/login', [AuthController::class, 'login']);
         Route::post('/refresh', [AuthController::class, 'refresh']);

@@ -6,8 +6,10 @@ use App\Enums\UserRole;
 use App\Models\RefreshToken;
 use App\Models\User;
 use App\Notifications\ResetPasswordNotification;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\GoogleProvider;
 use Tests\TestCase;
@@ -287,5 +289,26 @@ class AuthTest extends TestCase
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['token']);
+    }
+
+    public function test_auth_rate_limiting_protects_against_brute_force(): void
+    {
+        RateLimiter::for('auth', function () {
+            return Limit::perMinute(2)
+                ->response(fn ($request, $headers) => response()->json([
+                    'success' => false,
+                    'message' => 'Too many authentication attempts. Please try again later.',
+                ], 429, $headers));
+        });
+
+        // First 2 attempts
+        $this->postJson('/api/v1/auth/login', ['email' => 'bad@example.com', 'password' => 'wrong'])->assertStatus(401);
+        $this->postJson('/api/v1/auth/login', ['email' => 'bad@example.com', 'password' => 'wrong'])->assertStatus(401);
+
+        // 3rd attempt throttled
+        $response = $this->postJson('/api/v1/auth/login', ['email' => 'bad@example.com', 'password' => 'wrong']);
+        $response->assertStatus(429)
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'Too many authentication attempts. Please try again later.');
     }
 }

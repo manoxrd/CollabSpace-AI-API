@@ -22,7 +22,10 @@ use App\Policies\MeetingPolicy;
 use App\Policies\ProjectPolicy;
 use App\Policies\ReportPolicy;
 use App\Policies\TaskPolicy;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -50,5 +53,31 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Report::class, ReportPolicy::class);
         Gate::policy(File::class, FilePolicy::class);
         Gate::policy(Folder::class, FolderPolicy::class);
+
+        // Authentication Rate Limiting (Brute-force protection: 5 attempts/minute)
+        RateLimiter::for('auth', function (Request $request) {
+            return Limit::perMinute(app()->environment('testing') ? 1000 : 5)
+                ->by($request->ip())
+                ->response(function (Request $request, array $headers) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Too many authentication attempts. Please try again later.',
+                        'errors' => [],
+                    ], 429, $headers);
+                });
+        });
+
+        // Global API Rate Limiting (60 requests/minute per authenticated user or IP)
+        RateLimiter::for('api', function (Request $request) {
+            return Limit::perMinute(app()->environment('testing') ? 1000 : 60)
+                ->by($request->user('api')?->id ?: $request->ip())
+                ->response(function (Request $request, array $headers) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Too many requests. Please slow down.',
+                        'errors' => [],
+                    ], 429, $headers);
+                });
+        });
     }
 }
