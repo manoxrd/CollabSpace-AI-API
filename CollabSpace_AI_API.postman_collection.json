@@ -1,0 +1,2763 @@
+{
+    "info": {
+        "_postman_id": "c011ab50-ace0-4000-8000-collabspace01",
+        "name": "CollabSpace API Documentation & Collection",
+        "description": "Official REST API documentation and test suite for CollabSpace platform.\n\nAll protected endpoints require Bearer Token authorization. A pre-configured development token is included in the collection variables.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+            }
+        ]
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://collabspace-ai-api.test/api/v1",
+            "type": "string"
+        },
+        {
+            "key": "token",
+            "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vY29sbGFic3BhY2UtYWktYXBpLnRlc3QiLCJpYXQiOjE3OTIyNzYwMjAsImV4cCI6NDk0NTg3NjAyMCwibmJmIjoxNzkyMjc2MDIwLCJqdGkiOiJFb1FVRDNNTjJHeUpXMk1TIiwic3ViIjoiMiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjciLCJyb2xlIjoidGVhbV9tZW1iZXIiLCJuYW1lIjoiTW9oYW1lZCBTYWxhaCIsImVtYWlsIjoibW9oYW1lZC5zYWxhaEBjb2xsYWJzcGFjZS5haSJ9.xMtsvAKIXI3yYAMhlBMTvgCaZ9RyeBqcsqrz7TFhYjw",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "01. Authentication",
+            "description": "Endpoints for user registration, credential authentication, token rotation, social login, and password management.",
+            "item": [
+                {
+                    "name": "Login - Team Member (Mohamed Salah)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "### Authenticate User\n\nAuthenticates user credentials and issues a JWT access token and rotating refresh token.\n\n**Response:**\n- `access_token`: JWT string for Bearer auth.\n- `raw_refresh_token`: Refresh token string.\n- `user`: Authenticated user entity.",
+                        "url": {
+                            "raw": "{{base_url}}/auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"mohamed.salah@collabspace.ai\",\n    \"password\": \"password\"\n}"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.data && jsonData.data.auth) {",
+                                    "    pm.environment.set(\"token\", jsonData.data.auth.access_token);",
+                                    "    pm.environment.set(\"refresh_token\", jsonData.data.auth.raw_refresh_token);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Login - Project Manager (Mohanad Wahib)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Authenticates with Project Manager role credentials.",
+                        "url": {
+                            "raw": "{{base_url}}/auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"mohanad.wahib@collabspace.ai\",\n    \"password\": \"password\"\n}"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.data && jsonData.data.auth) {",
+                                    "    pm.environment.set(\"token\", jsonData.data.auth.access_token);",
+                                    "    pm.environment.set(\"refresh_token\", jsonData.data.auth.raw_refresh_token);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Register Account",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "### Create User Account\n\nRegisters a new user and returns authenticated JWT credentials immediately.\n\n**Body Parameters:**\n- `name`: string (required)\n- `email`: valid email (required, unique)\n- `password`: min 8 chars (required)\n- `password_confirmation`: matches password (required)\n- `role`: `admin` | `project_manager` | `team_member` (optional, default `team_member`)",
+                        "url": {
+                            "raw": "{{base_url}}/auth/register",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "register"
+                            ]
+                        },
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Kareem Ahmed\",\n    \"email\": \"kareem.ahmed@example.com\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\",\n    \"role\": \"team_member\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Refresh Access Token",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "### Rotate Refresh Token\n\nExchanges an existing unexpired refresh token for a brand new access token and rotating refresh token.",
+                        "url": {
+                            "raw": "{{base_url}}/auth/refresh",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "refresh"
+                            ]
+                        },
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"refresh_token\": \"{{refresh_token}}\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Logout Session",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "### Terminate Session\n\nRevokes the provided refresh token and invalidates the session.",
+                        "url": {
+                            "raw": "{{base_url}}/auth/logout",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "logout"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"refresh_token\": \"{{refresh_token}}\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Forgot Password Request",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "### Send Password Reset Link\n\nSends a password reset token notification to the registered email address.",
+                        "url": {
+                            "raw": "{{base_url}}/auth/forgot-password",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "forgot-password"
+                            ]
+                        },
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"mohamed.salah@collabspace.ai\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Reset Password",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "### Complete Password Reset\n\nUpdates user password using the token sent in the password reset notification.",
+                        "url": {
+                            "raw": "{{base_url}}/auth/reset-password",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "reset-password"
+                            ]
+                        },
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"token\": \"example_reset_token\",\n    \"email\": \"mohamed.salah@collabspace.ai\",\n    \"password\": \"new_password123\",\n    \"password_confirmation\": \"new_password123\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Google OAuth Exchange",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "### Exchange Google ID Token\n\nAuthenticates or registers a user via Google OAuth ID token, returning JWT credentials.",
+                        "url": {
+                            "raw": "{{base_url}}/auth/google",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "google"
+                            ]
+                        },
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"token\": \"google_id_token_string\"\n}"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "02. Profile & Settings",
+            "description": "User profile management, personal tasks, uploaded files, and activity logs.",
+            "item": [
+                {
+                    "name": "Get Current Profile",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Fetches current authenticated user profile, avatar, role, bio, and settings.",
+                        "url": {
+                            "raw": "{{base_url}}/profile",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "profile"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Profile",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Updates user profile information, bio, phone, title, and availability status (`available`, `busy`, `away`, `offline`).",
+                        "url": {
+                            "raw": "{{base_url}}/profile",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "profile"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Mohamed Salah\",\n    \"phone\": \"+201012345678\",\n    \"job_title\": \"Senior Frontend Engineer\",\n    \"department\": \"Product Engineering\",\n    \"bio\": \"Focusing on reactive components and micro-interactions.\",\n    \"availability\": \"available\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Get My Tasks",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Returns list of tasks assigned to or created by the current user.",
+                        "url": {
+                            "raw": "{{base_url}}/profile/tasks",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "profile",
+                                "tasks"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get My Files",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Returns list of files uploaded by the current user.",
+                        "url": {
+                            "raw": "{{base_url}}/profile/files",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "profile",
+                                "files"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get My Activity Log",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Retrieves recent activities and actions performed by the current user.",
+                        "url": {
+                            "raw": "{{base_url}}/profile/activities",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "profile",
+                                "activities"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "03. Dashboard",
+            "description": "Analytics widgets, urgent items, summary metrics, and velocity charts.",
+            "item": [
+                {
+                    "name": "Stats Summary",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Retrieves high-level counts: active projects, total tasks, upcoming meetings, unread chats.",
+                        "url": {
+                            "raw": "{{base_url}}/dashboard/stats",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "dashboard",
+                                "stats"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Project Velocity Chart",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Returns velocity and completion rate data for charts over time.",
+                        "url": {
+                            "raw": "{{base_url}}/dashboard/project-overview-chart",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "dashboard",
+                                "project-overview-chart"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Active Projects",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Returns list of currently active projects for quick widget display.",
+                        "url": {
+                            "raw": "{{base_url}}/dashboard/active-projects",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "dashboard",
+                                "active-projects"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Recent Files",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Retrieves the 5 most recently uploaded or accessed files.",
+                        "url": {
+                            "raw": "{{base_url}}/dashboard/recent-files",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "dashboard",
+                                "recent-files"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Urgent Tasks",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Returns urgent and high-priority tasks requiring immediate attention.",
+                        "url": {
+                            "raw": "{{base_url}}/dashboard/urgent-tasks",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "dashboard",
+                                "urgent-tasks"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Team Overview",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Fetches team member availability list and contact status.",
+                        "url": {
+                            "raw": "{{base_url}}/dashboard/team-overview",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "dashboard",
+                                "team-overview"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Upcoming Meetings",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Returns upcoming scheduled meetings for the current user.",
+                        "url": {
+                            "raw": "{{base_url}}/dashboard/upcoming-meetings",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "dashboard",
+                                "upcoming-meetings"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "04. Projects",
+            "description": "Complete project lifecycle management, team allocations, sub-tabs, and project files.",
+            "item": [
+                {
+                    "name": "List All Projects",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Returns paginated list of projects accessible to the authenticated user.",
+                        "url": {
+                            "raw": "{{base_url}}/projects?status=in_progress&page=1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "projects"
+                            ],
+                            "query": [
+                                {
+                                    "key": "status",
+                                    "value": "in_progress"
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Project",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Creates a new project.\n\n**Body Parameters:**\n- `name`: string\n- `description`: text\n- `status`: `planning` | `in_progress` | `on_hold` | `completed` | `archived`\n- `priority`: `low` | `medium` | `high` | `urgent`\n- `start_date`: YYYY-MM-DD\n- `due_date`: YYYY-MM-DD",
+                        "url": {
+                            "raw": "{{base_url}}/projects",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "projects"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Mobile App Redesign\",\n    \"description\": \"Complete UX revamp of the iOS and Android client applications.\",\n    \"status\": \"in_progress\",\n    \"priority\": \"high\",\n    \"start_date\": \"2026-10-01\",\n    \"due_date\": \"2026-12-15\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Get Project Details",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Retrieves full details of a specific project.",
+                        "url": {
+                            "raw": "{{base_url}}/projects/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "projects",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Project",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Updates project information, dates, status, or description.",
+                        "url": {
+                            "raw": "{{base_url}}/projects/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "projects",
+                                "1"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Mobile App Redesign v2\",\n    \"status\": \"in_progress\",\n    \"priority\": \"urgent\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Project",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Permanently removes a project and associated records (subject to policy authorization).",
+                        "url": {
+                            "raw": "{{base_url}}/projects/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "projects",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Project Overview Sub-Tab",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Returns aggregated overview metrics, milestone stats, and team assignments for the project tab.",
+                        "url": {
+                            "raw": "{{base_url}}/projects/1/overview",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "projects",
+                                "1",
+                                "overview"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Project Teams Sub-Tab",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Returns assigned team members grouped by department or function.",
+                        "url": {
+                            "raw": "{{base_url}}/projects/1/teams",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "projects",
+                                "1",
+                                "teams"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Assign Teams to Project",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Syncs department teams to a project.",
+                        "url": {
+                            "raw": "{{base_url}}/projects/1/teams",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "projects",
+                                "1",
+                                "teams"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"teams\": [\n        \"Design\",\n        \"Frontend\",\n        \"Backend\"\n    ]\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Assign Member to Project",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Adds a user to the project member list.",
+                        "url": {
+                            "raw": "{{base_url}}/projects/1/members",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "projects",
+                                "1",
+                                "members"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"user_id\": 2,\n    \"role\": \"contributor\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Remove Member from Project",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Removes a user from project membership.",
+                        "url": {
+                            "raw": "{{base_url}}/projects/1/members/2",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "projects",
+                                "1",
+                                "members",
+                                "2"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Project Tasks Kanban",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Retrieves the Kanban board columns (`todo`, `in_progress`, `review`, `completed`) scoped to this project.",
+                        "url": {
+                            "raw": "{{base_url}}/projects/1/tasks/kanban",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "projects",
+                                "1",
+                                "tasks",
+                                "kanban"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Project Files Sub-Tab",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Retrieves root files and folders attached to this project.",
+                        "url": {
+                            "raw": "{{base_url}}/projects/1/files",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "projects",
+                                "1",
+                                "files"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Upload Project File",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Uploads a document or media asset directly to the project directory.",
+                        "url": {
+                            "raw": "{{base_url}}/projects/1/files",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "projects",
+                                "1",
+                                "files"
+                            ]
+                        },
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "name",
+                                    "value": "Technical_Architecture.pdf",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "file",
+                                    "type": "file",
+                                    "src": []
+                                },
+                                {
+                                    "key": "folder_id",
+                                    "value": "1",
+                                    "type": "text"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Project Folder",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Creates a new folder in the project directory.",
+                        "url": {
+                            "raw": "{{base_url}}/projects/1/folders",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "projects",
+                                "1",
+                                "folders"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Design Assets\",\n    \"parent_id\": null\n}"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "05. Tasks & Kanban",
+            "description": "Kanban workflow, drag-and-drop status transitions, assignee management, reviewers, and discussions.",
+            "item": [
+                {
+                    "name": "List Tasks / Global Kanban",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Fetches tasks with optional filtering by `project_id`, `status`, `priority`, or `assignee_id`.",
+                        "url": {
+                            "raw": "{{base_url}}/tasks?project_id=1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "tasks"
+                            ],
+                            "query": [
+                                {
+                                    "key": "project_id",
+                                    "value": "1"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Task",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Creates a new task in a project.",
+                        "url": {
+                            "raw": "{{base_url}}/tasks",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "tasks"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"project_id\": 1,\n    \"title\": \"Implement OAuth 2.0 PKCE Flow\",\n    \"description\": \"Add PKCE support to mobile client authentication endpoints.\",\n    \"priority\": \"high\",\n    \"status\": \"todo\",\n    \"due_date\": \"2026-11-01\",\n    \"reviewer_id\": 3,\n    \"assignees\": [\n        2\n    ]\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Get Task Details",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Retrieves task details with assignees, reviewer, activity history, and comments.",
+                        "url": {
+                            "raw": "{{base_url}}/tasks/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "tasks",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Task",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Updates task title, description, due date, priority, or reviewer.",
+                        "url": {
+                            "raw": "{{base_url}}/tasks/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "tasks",
+                                "1"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Implement OAuth 2.0 PKCE Flow with Biometrics\",\n    \"priority\": \"urgent\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Task",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Deletes a task.",
+                        "url": {
+                            "raw": "{{base_url}}/tasks/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "tasks",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Task Status (Drag & Drop)",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Updates Kanban stage (`todo`, `in_progress`, `review`, `completed`) and column order.",
+                        "url": {
+                            "raw": "{{base_url}}/tasks/1/status",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "tasks",
+                                "1",
+                                "status"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"status\": \"in_progress\",\n    \"order\": 1\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Add Task Comment",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Posts a comment/discussion reply on the task.",
+                        "url": {
+                            "raw": "{{base_url}}/tasks/1/comments",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "tasks",
+                                "1",
+                                "comments"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"comment\": \"Initial PR opened for review: https://github.com/org/repo/pull/42\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Sync Task Assignees",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Updates the set of user IDs assigned to this task.",
+                        "url": {
+                            "raw": "{{base_url}}/tasks/1/assignees",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "tasks",
+                                "1",
+                                "assignees"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"assignees\": [\n        2,\n        3\n    ]\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Assign Task Reviewer",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Assigns a project manager or peer reviewer to evaluate completed work.",
+                        "url": {
+                            "raw": "{{base_url}}/tasks/1/reviewer",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "tasks",
+                                "1",
+                                "reviewer"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"reviewer_id\": 3\n}"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "06. Real-Time Chat & Inbox",
+            "description": "Direct messages (1-on-1), project channels, live socket broadcast messages, threads, and unread management.",
+            "item": [
+                {
+                    "name": "Direct Inbox (1-on-1)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Returns list of direct message conversations with latest message snippet and unread badges.",
+                        "url": {
+                            "raw": "{{base_url}}/chat/inbox",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "chat",
+                                "inbox"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Start / Get Direct Chat",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Finds or creates a 1-on-1 direct message channel with a user.",
+                        "url": {
+                            "raw": "{{base_url}}/chat/direct",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "chat",
+                                "direct"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"user_id\": 3\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Project Channels Feed",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Retrieves all public/private chat channels belonging to project #1.",
+                        "url": {
+                            "raw": "{{base_url}}/chat/projects/1/channels",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "chat",
+                                "projects",
+                                "1",
+                                "channels"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Channel",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Creates a new topic or project channel.",
+                        "url": {
+                            "raw": "{{base_url}}/chat/channels",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "chat",
+                                "channels"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"project_id\": 1,\n    \"name\": \"announcements\",\n    \"type\": \"public\",\n    \"description\": \"Important milestones and team broadcasts\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Get Channel Details",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Returns channel information, participant count, and membership status.",
+                        "url": {
+                            "raw": "{{base_url}}/chat/channels/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "chat",
+                                "channels",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Channel Messages Feed",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Fetches paginated message history for the channel.",
+                        "url": {
+                            "raw": "{{base_url}}/chat/channels/1/messages?page=1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "chat",
+                                "channels",
+                                "1",
+                                "messages"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Send Message (Broadcasts to Socket)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Dispatches a message into the channel and broadcasts `ChatMessageSent` event.",
+                        "url": {
+                            "raw": "{{base_url}}/chat/channels/1/messages",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "chat",
+                                "channels",
+                                "1",
+                                "messages"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"message\": \"Good morning team! The design review starts in 15 minutes.\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Update Message",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Edits a previously posted message.",
+                        "url": {
+                            "raw": "{{base_url}}/chat/messages/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "chat",
+                                "messages",
+                                "1"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"message\": \"Good morning team! The design review starts in 10 minutes.\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Message",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Soft-deletes or removes a message from the conversation.",
+                        "url": {
+                            "raw": "{{base_url}}/chat/messages/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "chat",
+                                "messages",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Reply to Message (Thread)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Creates a threaded reply to a parent message.",
+                        "url": {
+                            "raw": "{{base_url}}/chat/messages/1/reply",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "chat",
+                                "messages",
+                                "1",
+                                "reply"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"message\": \"Joining now, see you all in the room!\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Get Message Thread",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Retrieves parent message and full thread conversation tree.",
+                        "url": {
+                            "raw": "{{base_url}}/chat/messages/1/thread",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "chat",
+                                "messages",
+                                "1",
+                                "thread"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Mark Channel as Read",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Resets unread counter for current user in this channel.",
+                        "url": {
+                            "raw": "{{base_url}}/chat/channels/1/read",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "chat",
+                                "channels",
+                                "1",
+                                "read"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Toggle Channel Mute",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Toggles notification mute state on/off for this channel.",
+                        "url": {
+                            "raw": "{{base_url}}/chat/channels/1/mute",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "chat",
+                                "channels",
+                                "1",
+                                "mute"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "07. Meetings & AI Summaries",
+            "description": "Schedule meetings, calendar view, RSVP handling, live audio/speech transcripts, and automated AI summary generation.",
+            "item": [
+                {
+                    "name": "List Meetings (Calendar View)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Fetches scheduled meetings with date range filtering for monthly and weekly calendars.",
+                        "url": {
+                            "raw": "{{base_url}}/meetings?start_date=2026-10-01&end_date=2026-10-31",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "meetings"
+                            ],
+                            "query": [
+                                {
+                                    "key": "start_date",
+                                    "value": "2026-10-01"
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2026-10-31"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Schedule Meeting",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Schedules a new meeting with participants and room link.",
+                        "url": {
+                            "raw": "{{base_url}}/meetings",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "meetings"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"project_id\": 1,\n    \"title\": \"Sprint 14 Planning & Retrospective\",\n    \"description\": \"Review milestone achievements and allocate upcoming backlog.\",\n    \"start_time\": \"2026-10-20 14:00:00\",\n    \"end_time\": \"2026-10-20 15:30:00\",\n    \"meeting_link\": \"https://meet.google.com/abc-defg-hij\",\n    \"participants\": [\n        2,\n        3\n    ]\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Generate Google Meet Space Link",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Provisions an authentic Google Meet room link using Google Meet API v2 (or compliant room code).",
+                        "url": {
+                            "raw": "{{base_url}}/meetings/google-meet-space",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "meetings",
+                                "google-meet-space"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Sprint 14 Design Alignment\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Google Meet API Diagnostics",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Checks current Google Meet API credentials, OAuth token validity, and live connectivity with Google Meet REST API v2.",
+                        "url": {
+                            "raw": "{{base_url}}/meetings/google-meet/diagnostics",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "meetings",
+                                "google-meet",
+                                "diagnostics"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Meeting Details",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Retrieves meeting room details, invitees, and current agenda status.",
+                        "url": {
+                            "raw": "{{base_url}}/meetings/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "meetings",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Meeting",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Updates meeting timing, room link, or agenda.",
+                        "url": {
+                            "raw": "{{base_url}}/meetings/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "meetings",
+                                "1"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Sprint 14 Planning (Updated)\",\n    \"start_time\": \"2026-10-20 14:30:00\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Cancel / Delete Meeting",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Cancels a scheduled meeting.",
+                        "url": {
+                            "raw": "{{base_url}}/meetings/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "meetings",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "RSVP to Meeting",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Responds with attendance status (`accepted`, `declined`, `tentative`).",
+                        "url": {
+                            "raw": "{{base_url}}/meetings/1/rsvp",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "meetings",
+                                "1",
+                                "rsvp"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"status\": \"accepted\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Get Live Transcripts",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Retrieves timestamped speech transcript segments recorded for this meeting.",
+                        "url": {
+                            "raw": "{{base_url}}/meetings/1/transcripts",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "meetings",
+                                "1",
+                                "transcripts"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Append Live Transcript",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Appends speech text to the meeting transcript stream and broadcasts to listeners.",
+                        "url": {
+                            "raw": "{{base_url}}/meetings/1/transcripts",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "meetings",
+                                "1",
+                                "transcripts"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"speaker_name\": \"Mohamed Salah\",\n    \"text\": \"The mobile API benchmarks show sub-50ms latency across all routes.\",\n    \"timestamp\": \"00:14:22\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Get AI Meeting Summary",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Fetches generated executive meeting brief, discussion key points, and action items.",
+                        "url": {
+                            "raw": "{{base_url}}/meetings/1/ai-summary",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "meetings",
+                                "1",
+                                "ai-summary"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Generate AI Meeting Summary",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Synthesizes transcripts and meeting notes into action items, decisions, and summaries.",
+                        "url": {
+                            "raw": "{{base_url}}/meetings/1/ai-summary",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "meetings",
+                                "1",
+                                "ai-summary"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "08. Files & Storage",
+            "description": "File inspection, secure downloads with auto-incrementing download telemetry, and folder navigation.",
+            "item": [
+                {
+                    "name": "View File Details",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Retrieves file metadata: size, mime type, download count, uploader, and parent directory.",
+                        "url": {
+                            "raw": "{{base_url}}/files/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "files",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Download File",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Downloads the raw file binary stream and automatically increments `downloads_count`.",
+                        "url": {
+                            "raw": "{{base_url}}/files/1/download",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "files",
+                                "1",
+                                "download"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete File",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Deletes file record and removes binary from underlying storage disk.",
+                        "url": {
+                            "raw": "{{base_url}}/files/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "files",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "View Folder Contents",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Retrieves folder details and lists child sub-folders and files within it.",
+                        "url": {
+                            "raw": "{{base_url}}/folders/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "folders",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Folder",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Deletes directory and recursively manages child items.",
+                        "url": {
+                            "raw": "{{base_url}}/folders/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "folders",
+                                "1"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "09. Reports & Analytics",
+            "description": "Executive KPI summary metrics, comparison bar charts, progress area curves, worker activity lines, and report exports.",
+            "item": [
+                {
+                    "name": "Executive KPI Summary",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Returns top-level metric tiles: task completion rate, project velocity, and active team rate with percentage delta.",
+                        "url": {
+                            "raw": "{{base_url}}/reports/summary",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "reports",
+                                "summary"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Deadline Comparison Chart",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Returns on-time vs delayed completion metrics across projects for comparative bar charts.",
+                        "url": {
+                            "raw": "{{base_url}}/reports/charts/deadline-comparison",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "reports",
+                                "charts",
+                                "deadline-comparison"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Project Progress Area Chart",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Returns chronological completion percentage dataset for gradient area charts.",
+                        "url": {
+                            "raw": "{{base_url}}/reports/charts/project-progress",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "reports",
+                                "charts",
+                                "project-progress"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Worker Activity Line Chart",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Returns team activity frequency and task completions per developer for line charts.",
+                        "url": {
+                            "raw": "{{base_url}}/reports/charts/worker-activity",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "reports",
+                                "charts",
+                                "worker-activity"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "List Generated Reports",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Retrieves previously generated report exports with download URLs.",
+                        "url": {
+                            "raw": "{{base_url}}/reports",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "reports"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Generate Detailed Report",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Queues and compiles a detailed analytical report.",
+                        "url": {
+                            "raw": "{{base_url}}/reports",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "reports"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"project_id\": 1,\n    \"report_type\": \"task_completion\",\n    \"date_from\": \"2026-10-01\",\n    \"date_to\": \"2026-10-18\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Get Report Details",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Fetches details and download status of a generated report.",
+                        "url": {
+                            "raw": "{{base_url}}/reports/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "reports",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Report",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Removes a generated report archive.",
+                        "url": {
+                            "raw": "{{base_url}}/reports/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "reports",
+                                "1"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "10. AI Assistant",
+            "description": "Intelligent conversational assistant, context injection, consultation sessions, and response feedback.",
+            "item": [
+                {
+                    "name": "List AI Conversations",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Returns list of user consultation sessions with latest message preview.",
+                        "url": {
+                            "raw": "{{base_url}}/ai/conversations",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "ai",
+                                "conversations"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create AI Conversation",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Initializes a new AI consultation session with an optional project context.",
+                        "url": {
+                            "raw": "{{base_url}}/ai/conversations",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "ai",
+                                "conversations"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Database Optimization Strategy\",\n    \"project_id\": 1\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Get AI Conversation History",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Retrieves conversation history and message stream.",
+                        "url": {
+                            "raw": "{{base_url}}/ai/conversations/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "ai",
+                                "conversations",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete AI Conversation",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Deletes consultation session and associated messages.",
+                        "url": {
+                            "raw": "{{base_url}}/ai/conversations/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "ai",
+                                "conversations",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Send Message to Assistant",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Sends a prompt to the assistant with project context and receives synthesized answer.",
+                        "url": {
+                            "raw": "{{base_url}}/ai/conversations/1/messages",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "ai",
+                                "conversations",
+                                "1",
+                                "messages"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"message\": \"What are the current blockers for Sprint 14, and which tasks are behind schedule?\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Submit Message Feedback",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Records user rating or feedback on generated response (`helpful`, `not_helpful`).",
+                        "url": {
+                            "raw": "{{base_url}}/ai/messages/1/feedback",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "ai",
+                                "messages",
+                                "1",
+                                "feedback"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"feedback\": \"helpful\"\n}"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "11. Notifications",
+            "description": "In-app notification bell, live alerts, read/unread status management, and email notifications for tasks and meetings.",
+            "item": [
+                {
+                    "name": "List Notifications",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Retrieves paginated notifications for the authenticated user, including the total unread counter. Pass `unread=1` to filter unread alerts only.",
+                        "url": {
+                            "raw": "{{base_url}}/notifications?unread=0&per_page=15",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "notifications"
+                            ],
+                            "query": [
+                                {
+                                    "key": "unread",
+                                    "value": "0"
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Unread Notifications Count",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Retrieves the count of unread notifications for badge rendering on the navbar bell icon.",
+                        "url": {
+                            "raw": "{{base_url}}/notifications/unread-count",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "notifications",
+                                "unread-count"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Mark Notification as Read",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Marks a single in-app notification as read.",
+                        "url": {
+                            "raw": "{{base_url}}/notifications/sample-uuid-or-id/read",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "notifications",
+                                "sample-uuid-or-id",
+                                "read"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Mark All Notifications as Read",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Marks all pending unread notifications as read for the authenticated user.",
+                        "url": {
+                            "raw": "{{base_url}}/notifications/read-all",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "notifications",
+                                "read-all"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Notification",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "description": "Permanently removes or dismisses an in-app notification from the user's feed.",
+                        "url": {
+                            "raw": "{{base_url}}/notifications/sample-uuid-or-id",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "notifications",
+                                "sample-uuid-or-id"
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
