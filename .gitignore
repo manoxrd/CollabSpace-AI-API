@@ -28,4 +28,6 @@ Homestead.yaml
 Thumbs.db
 
 requirements/
+collabspace_ai
+*.sqlite
 
